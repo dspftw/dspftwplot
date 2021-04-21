@@ -1,0 +1,2 @@
+class DSPFTWPlottingException(Exception):
+    pass

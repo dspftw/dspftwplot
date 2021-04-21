@@ -1,0 +1,6 @@
+.tox
+dist
+Pipfile.lock
+*.egg-info
+__pycache__
+VERSION

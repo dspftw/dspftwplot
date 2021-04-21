@@ -23,7 +23,7 @@ setup(
     keywords='dsp signal processing plotting complex'.split(),
     url='https://github.com/dspftw/dspftwplot',
     packages=['dspftwplot'],
-    install_requires=['dspftw', 'ipywidgets'],
+    install_requires=['dspftw', 'ipywidgets', 'matplotlib'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Topic :: Scientific/Engineering',

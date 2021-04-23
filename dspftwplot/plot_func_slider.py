@@ -23,7 +23,7 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
     '''
 
     if len(args) not in [2,3]:
-        raise DSPFTWException("Input args should be 2 or 3 arguments but {} was provided".format(args))
+        raise DSPFTWPlottingException("Input args should be 2 or 3 arguments but {} was provided".format(args))
     
     f = args[0]
     t = args[1]

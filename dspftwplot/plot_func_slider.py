@@ -10,7 +10,7 @@ import ipywidgets as widgets
 def plot_func_slider(*args, **kwargs) -> plt.Figure:
     '''
     Plot the input function, displaying one plot per input sets.
-    
+
     Parameters
     ----------
     func: function which takes N inputs
@@ -24,7 +24,7 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
 
     if len(args) not in [2,3]:
         raise DSPFTWPlottingException("Input args should be 2 or 3 arguments but {} was provided".format(args))
-    
+
     f = args[0]
     t = args[1]
     frmt_str = '-'
@@ -40,8 +40,9 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
 
     def plot_funct(*args1, **kwargs1):
         fig = plt.gcf()
-        fins = [t[i][sliders_dict[sliders_keys[i]].value] for i in range(len(t))]
-        data = f(*fins)
+        args1 = [t[i][sliders_dict[sliders_keys[i]].value] for i in range(len(t))]
+        kwargs1 = f(*args1)
+        data = kwargs1
 
         if np.isrealobj(data):
             y = data

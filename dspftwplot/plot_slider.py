@@ -1,11 +1,12 @@
 # vim: expandtab tabstop=4 shiftwidth=4
 
-from .exceptions import DSPFTWPlottingException
+from ipywidgets import interact
+from ipywidgets.widgets import IntSlider
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ipywidgets import interact
-import ipywidgets as widgets
+
+from .exceptions import DSPFTWPlottingException
 
 def plot_slider(*args, **kwargs) -> plt.Figure:
     '''
@@ -37,21 +38,21 @@ def plot_slider(*args, **kwargs) -> plt.Figure:
     data_idx = []
     str_idx = []
     frmt_str = "-"
-    for k in range(len(args)):
-        arg = args[k]
+
+    for k, arg in enumerate(args):
         if type(arg) is not str:
             if len(arg.shape) != 2:
-                raise DSPFTWPlottingException("Input array {} (argument {}) is not a 2D input array".format(k, arg))
+                raise DSPFTWPlottingException(f"Input array {k} (argument {arg}) is not a 2D input array")
             num_cols.append(arg.shape[1])
             data_idx.append(k)
         else:
             frmt_str = arg
             str_idx.append(k)
-    
+
     # Check that all the number of columns are the same
     if len(set(num_cols)) > 1:
         raise DSPFTWPlottingException("Not all the input arrays have the same number of columns")
-    
+
     # Figure out the number of input arrays
     num_inputs = len(data_idx)
 
@@ -86,15 +87,15 @@ def plot_slider(*args, **kwargs) -> plt.Figure:
             ax = fig.gca()
             ln = ax.get_lines()
             if z is None:
-                ln[0].set_data(x,y)
+                ln[0].set_data(x, y)
             else:
-                ln[0].set_data_3d(x,y,z)
+                ln[0].set_data_3d(x, y, z)
             ax.relim()
             ax.autoscale_view(True, True, True)
         fig.canvas.draw()
-        
-    interact(plot_funct, col_num = widgets.IntSlider(value=0, min=0, max=num_cols[0]-1, step=1))
-            
+
+    interact(plot_funct, col_num = IntSlider(value=0, min=0, max=num_cols[0]-1, step=1))
+
 
 
 def plots(*args, **kwargs) -> plt.Figure:

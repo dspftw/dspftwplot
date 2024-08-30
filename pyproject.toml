@@ -20,26 +20,51 @@ dspftw = "*"
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 
+[tool.pylint.'MESSAGES CONTROL']
+max-line-length = 120
+disable = [
+  "too-many-nested-blocks",
+  "too-many-branches",
+  "too-many-statements",
+  "R0801",
+  "R0902",
+  "R0903",
+  "R0911",
+  "R0913",
+  "R0914",
+  "C0103",
+  "C0114",
+  "C0115",
+  "C0116",
+  "C0123",
+  "C0301",
+  "C0302",
+  "fixme",
+]
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
-envlist = py38
+envlist = py39,py310,py311
 isolated_build = true
 
 [gh-actions]
 python =
-	3.8: py38
-	3.9: py39
+  3.9: py39
+  3.10: py310
+  3.11: py311
 
 [testenv]
 recreate = true
 changedir = tests
 deps =
-	dspftw
-	ipywidgets
-	matplotlib
-	pylint
+  dspftw
+  ipywidgets
+  matplotlib
+  flake8
+  pylint
 commands =
-	python -m pylint --disable=C,R -s no dspftwplot
-	python -m unittest discover
+  python -m flake8 --select E201,E202,E231,E262,E265 dspftwplot
+  python -m pylint dspftwplot
+  python -m unittest discover
 """

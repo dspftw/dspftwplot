@@ -1,11 +1,10 @@
-# vim: expandtab tabstop=4 shiftwidth=4
-
-from .exceptions import DSPFTWPlottingException
+from ipywidgets import interact
+from ipywidgets.widgets import IntSlider
 
 import matplotlib.pyplot as plt
 import numpy as np
-from ipywidgets import interact
-import ipywidgets as widgets
+
+from .exceptions import DSPFTWPlottingException
 
 def plot_func_slider(*args, **kwargs) -> plt.Figure:
     '''
@@ -22,25 +21,27 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
         Parameters passed through to plt.Figure.plot()
     '''
 
-    if len(args) not in [2,3]:
-        raise DSPFTWPlottingException("Input args should be 2 or 3 arguments but {} was provided".format(args))
+    if len(args) not in (2, 3):
+        raise DSPFTWPlottingException(f"Input args should be 2 or 3 arguments but {args} was provided")
 
     f = args[0]
     t = args[1]
     frmt_str = '-'
+
     if len(args) == 3:
         frmt_str = args[2]
 
     sliders_dict = {}
     sliders_keys = []    # must be in same order as defined so I'm saving the keys without using .keys()
-    for i in range(len(t)):
-        sliders_key = "in{}_idx".format(i)
-        sliders_dict[sliders_key] = widgets.IntSlider(value=0, min=0, max=len(t[i])-1, step=1)
+
+    for i, tval in enumerate(t):
+        sliders_key = f"in{i}_idx"
+        sliders_dict[sliders_key] = IntSlider(value=0, min=0, max=len(tval)-1, step=1)
         sliders_keys.append(sliders_key)
 
     def plot_funct(*args1, **kwargs1):
         fig = plt.gcf()
-        args1 = [t[i][sliders_dict[sliders_keys[i]].value] for i in range(len(t))]
+        args1 = [tval[sliders_dict[sliders_keys[i]].value] for i, tval in enumerate(t)]
         kwargs1 = f(*args1)
         data = kwargs1
 
@@ -50,6 +51,7 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
         else:
             x = data.real
             y = data.imag
+
         if len(fig.get_axes()) == 0:
             ax, = plt.plot(x, y, frmt_str, **kwargs)
         else:
@@ -58,6 +60,7 @@ def plot_func_slider(*args, **kwargs) -> plt.Figure:
             ln[0].set_data(x, y)
             ax.relim()
             ax.autoscale_view(True, True, True)
+
         fig.canvas.draw()
 
     interact(plot_funct, **sliders_dict)

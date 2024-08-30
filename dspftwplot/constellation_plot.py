@@ -1,5 +1,3 @@
-# vim: expandtab tabstop=4 shiftwidth=4
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -23,51 +21,57 @@ def constellation_plot(constellation: np.array, binary_mode: int=0, scale: int=1
 
     # Ensure constellation is a 1-dimensional complex array
     con = constellation.flatten().astype(complex)
+
     # Constellation size
     con_size = len(con)
 
     # Check Parameters
     # Constellations must contain at least 1 element
     if con_size < 1:
-        print("constellation_plot error: Constellation size (",con_size,") must be at least 1.")
-        return constellation
+        raise ValueError("constellation_plot constellation size must be at least 1")
 
     # If user provided mode, then it must be 0 or 1
-#    if (binary_mode != 0) and (binary_mode != 1):
-    if binary_mode not in (0,1):
-        print("constellation_plot error: User input mode (",binary_mode,") must be either 0 or 1.")
-        return constellation
+    if binary_mode not in (0, 1):
+        raise ValueError("constellation_plot binary_mode must be 0 or 1")
 
     # If user provided sceale, then it must be nonnegative
     if scale < 0:
-        print("constellation_plot error: User input scale (",scale,") must be nonnegative.")
-        return constellation
+        raise ValueError("constellation_plot scale must be nonnegative")
 
     # Number of bits per symbol
     bps = np.ceil(np.log2(con_size)).astype(int)
 
     # Plotting logic
-    plt.suptitle("Scatterplot of {0}-point constellation".format(con_size))
+    plt.suptitle(f"Scatterplot of {con_size}-point constellation")
     size = 1
-    for k in np.arange(0,con_size):
+
+    for k in np.arange(0, con_size):
         # Determine plot scale
-        if binary_mode == 0: # Decimal Mode
+
+        # Decimal Mode
+        if binary_mode == 0:
             # Number of decimal digits in k
             if k == 0:
                 ndigit = 1
             else:
                 ndigit = np.floor(np.log10(k))+1
-            size = scale*ndigit
-            txt = "${0}$".format(k)
-        elif binary_mode == 1: # Binary Mode
-            size = scale*bps
-            tmp = decimal_convert_to_base(k,2,bps).flatten()
+            size = scale * ndigit
+            txt = f"${k}$"
+
+        # Binary Mode
+        elif binary_mode == 1:
+            size = scale * bps
+            tmp = decimal_convert_to_base(k, 2, bps).flatten()
             # Convert binary array to string
             txt = "$"
-            for idx in np.arange(0,bps):
-                txt = "{0}{1}".format(txt,tmp[idx])
-            txt = "{0}$".format(txt)
-        plt.scatter(con[k].real,con[k].imag,s=size,marker=txt,c='k')
+
+            for idx in np.arange(0, bps):
+                txt = f"{txt}{tmp[idx]}"
+
+            txt = f"{txt}$"
+
+        plt.scatter(con[k].real, con[k].imag, s=size, marker=txt, c='k')
+
     plt.show()
 
     # Return power normalized constellation

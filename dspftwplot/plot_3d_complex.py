@@ -1,14 +1,12 @@
-# vim: expandtab tabstop=4 shiftwidth=4
-
-from .exceptions import DSPFTWPlottingException
-
 import matplotlib.pyplot as plt
 import numpy as np
+
+from .exceptions import DSPFTWPlottingException
 
 def plot_3d_complex(*args, **kwargs):
     '''
     Plots complex data in a 3D space (time vs complex plane).
-    
+
     Parameters
     ----------
     args: real and complex ndarray(s) and possibly str(s)
@@ -25,60 +23,71 @@ def plot_3d_complex(*args, **kwargs):
     num_reals = 0
     num_cplxs = 0
     for arg in args:
-        if type(arg) is str:
+        if isinstance(arg, str):
             num_strs += 1
         elif np.isrealobj(arg):
             num_reals += 1
         elif np.iscomplexobj(arg):
             num_cplxs += 1
         else:
-            raise DSPFTWPlottingException("Input number {} (argument {}) is not a valid input argument".format(args.index(arg), arg))
+            raise DSPFTWPlottingException(f"Input number {args.index(arg)} (argument {arg}) is not a valid input argument")
+
     if num_reals > num_cplxs:
         raise DSPFTWPlottingException("Too many real arguments were given.  You must have 1 complex argument for each real argument")
+
     if num_strs > num_cplxs:
         raise DSPFTWPlottingException("Too many formatting arguments were given.  You must have 1 complex argument for each formatting argument")
 
     # Check the order of the arguments to make sure they're valid
-    for k in range(len(args)):
-        if type(args[k]) is str:
+    for k in range(len(args)):  # pylint: disable=consider-using-enumerate
+        if isinstance(args[k], str):
             if k == 0:
-                raise DSPFTWPlottingException("A complex argument must precede the formatting argument {}".format(args[k]))
-            elif not np.iscomplexobj(args[k-1]):
-                raise DSPFTWPlottingException("A complex argument must precede the formatting argument {}".format(args[k]))
-        if np.isrealobj(args[k]) and type(args[k]) is not str:
-            if k == len(args)-1:
-                raise DSPFTWPlottingException("A complex argument must follow the real argument {}".format(args[k]))
-            elif not np.iscomplexobj(args[k+1]):
-                raise DSPFTWPlottingException("A complex argument must follow the real argument {}".format(args[k+1]))
+                raise DSPFTWPlottingException(f"A complex argument must precede the formatting argument {args[k]}")
+
+            if not np.iscomplexobj(args[k-1]):
+                raise DSPFTWPlottingException(f"A complex argument must precede the formatting argument {args[k]}")
+
+        if np.isrealobj(args[k]) and not isinstance(args[k], str):
+            if k == len(args) - 1:
+                raise DSPFTWPlottingException(f"A complex argument must follow the real argument {args[k]}")
+
+            if not np.iscomplexobj(args[k+1]):
+                raise DSPFTWPlottingException(f"A complex argument must follow the real argument {args[k+1]}")
 
     # Work through the input argument list, separating it into chunks that go together
     t_plotargs = []
     t_args = []
     k = 0
+
     while k < len(args):
         if np.isrealobj(args[k]):
             t_args.append(args[k])
             t_args.append(args[k+1])
-            if k+2 < len(args) and type(args[k+2]) is str:
+
+            if k+2 < len(args) and isinstance(args[k+2], str):
                 t_args.append(args[k+2])
                 k += 3
             else:
                 t_args.append("-")
                 k += 2
+
         elif np.iscomplexobj(args[k]):
             t_args.append(np.arange(args[k].shape[0]))
             t_args.append(args[k])
-            if k+1 < len(args) and type(args[k+1]) is str:
+
+            if k+1 < len(args) and isinstance(args[k+1], str):
                 t_args.append(args[k+1])
                 k += 2
             else:
                 t_args.append("-")
                 k += 1
+
         t_plotargs.append(t_args)
         t_args = []
 
     # Expand all the complex arrays
     plotargs = []
+
     for args in t_plotargs:
         if len(args[1].shape) > 1:
             for k in range(args[1].shape[1]):
@@ -90,10 +99,11 @@ def plot_3d_complex(*args, **kwargs):
     # y = real part
     # z = imag part
     ax = plt.axes(projection='3d')
+
     for k in range(len(plotargs)//4):
         t_args = plotargs[k*4:(k+1)*4]
         ax.plot(*t_args, **kwargs)
-    
+
 
 
 def plot3c(*args, **kwargs) -> plt.Figure:
